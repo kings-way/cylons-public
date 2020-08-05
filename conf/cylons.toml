@@ -1,0 +1,70 @@
+interface 	= "br-lan"
+filter 		= ""
+db_path   	= "/root/cylons.db"
+
+[api]
+	enabled = true
+	listen_addr = "0.0.0.0:8000"
+
+[pcap_dump]
+	enabled = true
+	file_dir = "/tmp"
+
+[sensitive_info]
+	match_pattern = "(password|secret|token|authorization|authorized|cookie)"
+
+[tls_mitm]
+	enabled = true
+	mitm_listen = "0.0.0.0:8443"
+	mitm_domain = ["*", "example.com"]		# "*" for wild match
+
+[tls_check]
+	enabled = true
+	ssllab_scan_enabled = false
+
+[[tcp_hijack]]
+	src   = "*"
+	sport = "*"
+	dst   = "223.5.5.5"
+	dport = "443"
+	[tcp_hijack.action]
+		reset = true
+		fuzz  = false
+
+
+[[tcp_hijack]]
+	src   = "*"
+	sport = "*"
+	dst   = "223.5.5.5"
+	dport = "80"
+	[tcp_hijack.action]
+		reset = false
+		fuzz  = true
+
+
+[[tcp_hijack]]
+	src   = "*"
+	sport = "*"
+	dst   = "8.8.4.4"
+	dport = "443"
+	[tcp_hijack.action]
+		reset = false
+		fuzz  = false
+	[tcp_hijack.inject]
+		#payload_pattern  = ".*77686f616d69.*"		# match string "whoami"
+		payload_pattern  = "77686f616d69"			# match string "whoami"
+		payload_response = [						# return string "You Are Hacked!\n"
+			0x59,0x6f,0x75,0x20,0x41,0x72,0x65,0x20,  0x48,0x61,0x63,0x6b,0x65,0x64,0x21,0x0a
+		]
+
+[[dns_hijack]]
+	name   = "*.cn"				# TODO IMPL
+	record = "192.168.233.233"
+
+[[dns_hijack]]
+	name   = "example.com"
+	record = "11.22.33.44"
+
+[[dns_hijack]]
+	name   = "test.com"
+	record = "127.0.0.1"

@@ -1,0 +1,15 @@
+[target.aarch64-unknown-linux-musl]
+# 
+# 1. export STAGING_DIR=/path/to/openwrt-sdk-19.07.0-brcm2708-bcm2710_gcc-7.5.0_musl.Linux-x86_64/staging_dir
+# 2. export OPENSSL_DIR=$STAGING_DIR/target-aarch64_cortex-a53_musl/usr             # ./scripts/feeds update -a;  ./scripts/feeds install -a;
+                                                                                    #  make menuconfig; make package/openssl/compile
+
+# 3. export PCAP_LIBDIR=$STAGING_DIR/target-aarch64_cortex-a53_musl/usr/lib         # if we compile libpcap inside SDK like: make package/libpcap/compile
+#    export PCAP_LIBDIR=/path/to/libpcap                                            # or we get libpcap '.so' or '.a' from somewhere else
+#
+# 4. 	CC=$STAGING_DIR/toolchain-aarch64_cortex-a53_gcc-7.5.0_musl/bin/aarch64-openwrt-linux-musl-gcc \
+#		cargo build --release --target=aarch64-unknown-linux-musl
+# 5. before we run on OpenWRT, check the /lib/ld-XXX has the same name like in our binary.
+
+linker = "/path/to/openwrt-sdk-19.07.0-brcm2708-bcm2710_gcc-7.5.0_musl.Linux-x86_64/staging_dir/toolchain-aarch64_cortex-a53_gcc-7.5.0_musl/bin/aarch64-openwrt-linux-musl-gcc"
+rustflags = ["-C", "link-args=-lgcc -lc -ldl"]    			# Fix the missing linking args on cargo build
